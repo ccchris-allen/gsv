@@ -170,7 +170,8 @@ if __name__ == "__main__":
     ]
 
     road = LineString(vertices)
-    # sample road segment every 30 meters and convert to UTM
+    
+    # convert to UTM and sample road segment every 30 meters
     samples = sample_road(road, delta=30.0, to_crs=32611)
 
     for (lon, lat), bearing in samples:
