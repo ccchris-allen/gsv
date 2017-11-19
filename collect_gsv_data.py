@@ -11,7 +11,7 @@ from pyproj import Proj, transform
 from shapely.geometry import Point, LineString
 from shapely.ops import transform as geom_transform
 #
-# this file is ignored by git and will need to be created with your own key
+# config.py is ignored by git so will need to be created with your own key
 from config import API_KEY
 
 
@@ -73,20 +73,22 @@ def save_image(img, fname):
     plt.savefig(fname)
 
 
-def save_streetview_image(lon, lat, bearing=0.0, output_dir=".", key=API_KEY):
-    panoid_infos = sv.panoids(lat, lon)
-    panoids = [p['panoid'] for p in panoid_infos]
-    coords = [(p['lat'], p['lon']) for p in panoid_infos]
-    years = [p['year'] for p in panoid_infos]
+def save_streetview_image(lon, lat, bearing=0.0, output_dir=".", 
+                            last_n=1, key=API_KEY):
 
-    if not panoids or not coords:
+    panoid_infos = sv.panoids(lat, lon)
+
+    if not panoid_infos:
         return None
 
-    pid = panoids[0]
-    plat, plon = coords[0]
-    year = years[0]
+    # grab last_n years where data is available
+    for i in range(last_n):
+        info = panoid_infos.pop(0)
 
-    return sv.api_download(pid, bearing, output_dir, year=year, key=key)
+        pid = info['panoid']
+        year = info['year']
+
+        sv.api_download(pid, bearing, output_dir, year=year, key=key)
 
     
 def cut(line, dist):
@@ -128,7 +130,7 @@ def sample_road(geometry, to_crs, from_crs=4326, delta=30.0):
 
     Returns:
         List of sampling points, where each item is a tuple that specifies
-        the longitude, latitude, and bearing:
+        the WGS84 longitude, latitude, and bearing:
 
         [((-117.34, 32.153), 90.0), ((-117.363, 32.13), 98.0), ... ]
     """
@@ -178,5 +180,5 @@ if __name__ == "__main__":
         print "Input lon =", lon
         print "Input lat =", lat
         print "Input bearing =", bearing
-        save_streetview_image(lon, lat, bearing, OUTPUT_DIR)
+        save_streetview_image(lon, lat, bearing, OUTPUT_DIR, last_n=2)
 
