@@ -73,12 +73,11 @@ def save_image(img, fname):
     plt.savefig(fname)
 
 
-def save_streetview_image(lon, lat, bearing=0.0, output_dir=".", 
-                            last_n=1, key=API_KEY):
 
     panoid_infos = sv.panoids(lat, lon)
 
     if not panoid_infos:
+        print "Oops, no panoids"
         return None
 
     # grab last_n years where data is available
@@ -86,9 +85,12 @@ def save_streetview_image(lon, lat, bearing=0.0, output_dir=".",
         info = panoid_infos.pop(0)
 
         pid = info['panoid']
-        year = info['year']
+        year = info.get('year', 2017)
+        plat = info['lat']
+        plng = info['lon']
 
-        sv.api_download(pid, bearing, output_dir, year=year, key=key)
+        sv.api_download(pid, bearing, output_dir, year=year, lat=plat,
+                lng=plng, key=key)
 
     
 def cut(line, dist):
