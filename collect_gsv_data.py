@@ -73,6 +73,8 @@ def save_image(img, fname):
     plt.savefig(fname)
 
 
+def save_streetview_image(lon, lat, bearing=0.0, output_dir='.',
+                            last_n=1, seq_n=None, key=API_KEY):
 
     panoid_infos = sv.panoids(lat, lon)
 
@@ -82,7 +84,10 @@ def save_image(img, fname):
 
     # grab last_n years where data is available
     for i in range(last_n):
-        info = panoid_infos.pop(0)
+        info = panoid_infos.pop()
+        # pop(0) assumes the first ids are the newest, but that doesn't seem to 
+        # be the case...
+        #info = panoid_infos.pop(0)
 
         pid = info['panoid']
         year = info.get('year', 2017)
@@ -90,7 +95,7 @@ def save_image(img, fname):
         plng = info['lon']
 
         sv.api_download(pid, bearing, output_dir, year=year, lat=plat,
-                lng=plng, key=key)
+                lng=plng, seq_n=seq_n, key=key)
 
     
 def cut(line, dist):
