@@ -1,0 +1,8 @@
+/data
+/images
+
+*.pyc
+
+config.py
+
+*.vim
